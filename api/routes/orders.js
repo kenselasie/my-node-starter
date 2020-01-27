@@ -4,8 +4,10 @@ const mongoose = require('mongoose')
 
 const Order = require('../models/orderModel')
 const Product = require('../models/productModel')
+const checkAuth = require('../middleware/check-auth')
 
-router.get('/', (req, res, next) => {
+
+router.get('/', checkAuth, (req, res, next) => {
     Order.find()
     .populate('product', 'name')
     .select('product quantity _id')
@@ -23,7 +25,7 @@ router.get('/', (req, res, next) => {
     
 })
 
-router.post('/', (req, res, next) => {
+router.post('/', checkAuth, (req, res, next) => {
     Product.findById(req.body.productId)
     .then(product => {
         if (!product) {
@@ -38,10 +40,14 @@ router.post('/', (req, res, next) => {
         })
     
         return order.save()       
-    }).then(result => {
+    }).then(order => {
+        console.log({
+            message: 'POST /orders',
+            order
+        })
         res.status(201).json({
             message: 'Order successfully created',
-            order: result
+            order
         })
     }).catch(err => {
         res.status(500).json({
@@ -51,17 +57,25 @@ router.post('/', (req, res, next) => {
 
 })
 
-router.get('/:orderId', (req, res, next) => {
-    Order.findById(req.params.orderId).exec()
+router.get('/:orderId', checkAuth, (req, res, next) => {
+    Order.findById(req.params.orderId)
+    .populate('product', 'name')
+    .exec()
     .then(order => {
         if(!order) {
-        res.status(404).json({
-            message: 'No such order'       
-        })
+            res.status(404).json({
+                message: 'No such order'       
+            })
+        } else {
+            console.log({
+                message: 'GET /order by Id',
+                order
+            })
+
+            res.status(200).json({
+                order       
+            })
         }
-        res.status(200).json({
-            order       
-        })
     }).catch(err => {
         res.status(500).json({
             err       
@@ -69,7 +83,7 @@ router.get('/:orderId', (req, res, next) => {
     })
 })
 
-router.delete('/:orderId', (req, res, next) => {
+router.delete('/:orderId', checkAuth, (req, res, next) => {
     Order.remove({_id: req.params.orderId}).exec()
     .then(order => {
         res.status(200).json({

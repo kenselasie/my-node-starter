@@ -6,6 +6,11 @@ const mongoose = require('mongoose')
 
 const productRoutes = require('./api/routes/products')
 const orderRoutes = require('./api/routes/orders')
+const userRoutes = require('./api/routes/user')
+
+if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').config();
+}
 
 //Database connection
 mongoose.Promise = global.Promise
@@ -17,6 +22,7 @@ app.use(morgan('dev'))
 app.use('/uploads', express.static('uploads'))
 app.use(bodyParser.urlencoded({extended:true}))
 app.use(bodyParser.json())
+
 
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*')
@@ -31,6 +37,7 @@ app.use((req, res, next) => {
 
 app.use('/products', productRoutes)
 app.use('/orders', orderRoutes)
+app.use('/user', userRoutes)
 
 app.use((req, res, next) => {
     const error = new Error('Not Found')
