@@ -4,7 +4,7 @@
   "description": "a rest api with node",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "node app.js"
   },
   "author": "Ken",
   "license": "ISC",
