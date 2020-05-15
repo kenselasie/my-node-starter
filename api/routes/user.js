@@ -132,11 +132,4 @@ router.delete('/:userId', (req, res, next) => {
 })
 
 
-
-
-
-
-
-
-
 module.exports = router
