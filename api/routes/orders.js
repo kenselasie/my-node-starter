@@ -1,28 +1,14 @@
-const express = require('express')
+import express from 'express'
+
+import Order from '../models/orderModel.js'
+import { getAllOrders } from '../controllers/ordersController.js'
+import Product from '../models/productModel.js'
+import checkAuth from '../middleware/check-auth.js'
+
 const router = express.Router()
-const mongoose = require('mongoose')
 
-const Order = require('../models/orderModel')
-const Product = require('../models/productModel')
-const checkAuth = require('../middleware/check-auth')
-
-
-router.get('/', checkAuth, (req, res, next) => {
-    Order.find()
-    .populate('product', 'name')
-    .select('product quantity _id')
-    .exec()
-    .then(docs => {
-        res.status(200).json({
-            message: 'Orders successfully fetched',
-            docs
-        })
-    }).catch(err => {
-        res.status(500).json({
-            error: err
-        })
-    })
-    
+router.get('/', checkAuth, (req, res) => {
+    return getAllOrders(req, res)
 })
 
 router.post('/', checkAuth, (req, res, next) => {
@@ -34,7 +20,6 @@ router.post('/', checkAuth, (req, res, next) => {
             })
         }
         const order = new Order({
-            _id: mongoose.Types.ObjectId(),
             product: req.body.productId,
             quantity: req.body.quantity
         })
@@ -96,4 +81,4 @@ router.delete('/:orderId', checkAuth, (req, res, next) => {
     })
 })
 
-module.exports = router
+export default router

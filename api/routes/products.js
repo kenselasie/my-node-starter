@@ -1,9 +1,10 @@
-const express = require('express')
-const mongoose = require('mongoose')
-const router = express.Router()
-const multer = require('multer')
-const checkAuth = require('../middleware/check-auth')
+import express from 'express'
+import multer from 'multer'
+import checkAuth from '../middleware/check-auth.js'
+import { getAllProducts, addProduct, getSingleProductById } from '../controllers/productsController.js'
+import Product from '../models/productModel.js'
 
+const router = express.Router()
 
 const storage = multer.diskStorage({
     destination: function(req, file, cb) {
@@ -31,67 +32,17 @@ const upload = multer({
     fileFilter: fileFilter
 })
 
-const Product = require('../models/productModel')
 
-router.get('/', (req, res, next) => {
-    Product.find()
-        .select('name price _id productImage')
-        .exec().then(docs => {
-        console.log(docs)
-        res.status(200).json({
-            message: 'All Products',
-            Products: docs
-        })
-    }).catch(err => {
-        console.log(err)
-        res.status(500).json({
-            error: err
-        })
-    })
-    
+router.get('/', (req, res) => {
+   return getAllProducts(req, res)
 })
 
-router.post('/', checkAuth, upload.single('productImage'),(req, res, next) => {
-    console.log(req.file)
-    const product = new Product({
-        _id: new mongoose.Types.ObjectId(),
-        name: req.body.name,
-        price: req.body.price,
-        productImage: req.file.path
-    })
-    product.save()
-        .then(result => {
-        console.log(result)
-        res.status(201).json({
-            message: 'Successfully posted data',
-            createdProduct: product
-        })
-    }).catch(err => {
-        console.log(err)
-        res.status(500).json({
-            error: err
-        })
-    })
+router.post('/',checkAuth, upload.single('productImage'), (req, res) => {
+    return addProduct(req, res)
 })
 
-router.get('/:productId', (req, res, next) => {
-    const id = req.params.productId
-    Product.findById(id)
-    .select('name price _id productImage')
-    .exec()
-    .then(doc => {
-        console.log(doc)
-        if (doc) {
-            res.status(200).json(doc)
-        } else {
-            res.status(404).json({
-                message: 'Does not exist in the database'
-            })
-        }
-    }).catch(err => {
-        console.log(err)
-        res.status(500).json({error: err})
-    })
+router.get('/:id',checkAuth, (req, res, next) => {
+    return getSingleProductById(req, res)
 })
 
 router.patch('/:productId', checkAuth, (req, res, next) => {
@@ -125,4 +76,4 @@ router.delete('/:productId', checkAuth, (req, res, next) => {
     })
 })
 
-module.exports = router
+export default router

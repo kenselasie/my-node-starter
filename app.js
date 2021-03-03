@@ -1,18 +1,19 @@
-const express = require('express')
-const morgan = require('morgan')
-const bodyParser = require('body-parser')
-const mongoose = require('mongoose')
-const path = require('path')
-
-const productRoutes = require('./api/routes/products')
-const orderRoutes = require('./api/routes/orders')
-const userRoutes = require('./api/routes/user')
+import express from "express"
+import cors from "cors"
+import bodyParser from "body-parser"
+import mongoose from "mongoose"
+import path from "path"
+import dotenv from "dotenv"
+import morgan from "morgan"
+import productRoutes  from './api/routes/products.js'
+import orderRoutes  from './api/routes/orders.js'
+import userRoutes  from './api/routes/user.js'
 
 const app = express()
 
-if (process.env.NODE_ENV !== 'production') {
-    require('dotenv').config();
-}
+// if (process.env.NODE_ENV !== 'production') {
+dotenv.config()
+// }
 
 //Database connection
 mongoose.Promise = global.Promise
@@ -26,17 +27,7 @@ app.use(bodyParser.urlencoded({extended:true}))
 app.use(bodyParser.json())
 
 
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*')
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization')
-
-    if (req.method === 'OPTIONS') {
-        res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET')
-        return res.status(200).json({})
-    }
-    next()
-})
-
+app.use(cors())
 app.use('/products', productRoutes)
 app.use('/orders', orderRoutes)
 app.use('/user', userRoutes)
@@ -65,5 +56,3 @@ const port = process.env.PORT || 3000
 app.listen(port, () =>{
     console.log(`App is listening on port ${port}!`)
 })
-
-// module.exports = app
