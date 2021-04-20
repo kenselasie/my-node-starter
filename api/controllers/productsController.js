@@ -63,14 +63,33 @@ const updateProduct = async (req, res) => {
 
     try {
         let result = await Product.updateMany({ _id: id }, { $set: body }, { new: true })
+        if (!result) return res.status(500).json({ message: 'Something bad occurred updating'  })
+        
         return res.status(200).json({
             message: 'Product updated succesfully'
         })
     } catch (err) {
         console.log(err)
-        return res.status(500).json({error: err})
+        return res.status(500).json({ error: err })
+    }
+}
+
+const deleteProduct = async (req, res) => {
+    try {
+        const id = req.params.productId
+        let result = await Product.remove({ _id: id })
+        if(!result) return res.status(500).json({ message: 'Something bad occurred deleting'  })
+
+        return res.status(200).json({
+            message: 'Successfully deleted'
+        })
+    }
+    catch (err) {
+        res.status(500).json({
+            error: err
+        })
     }
 }
 
 
-export { getAllProducts, addProduct, getSingleProductById }
+export { getAllProducts, addProduct, getSingleProductById, updateProduct, deleteProduct }
