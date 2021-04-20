@@ -1,7 +1,7 @@
 {
   "name": "myrest",
   "version": "1.0.0",
-  "description": "a rest api with node",
+  "description": "a rest api with nodejs",
   "main": "app.js",
   "type": "module",
   "scripts": {
